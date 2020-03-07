@@ -1,11 +1,13 @@
 module V1
     class TodoComments < Grape::API
         resources :todo_comments do
+            # present @instance, with: EntityName
 
             # 動作確認
             desc '一覧'
             get '/' do
                 @todo_comments = TodoComment.all
+                present @todo_comments, with: V1::Entities::TodoCommentEntity
             end
 
             desc '詳細'
@@ -14,15 +16,28 @@ module V1
             end
             get '/:id' do
                 @todo_comment = TodoComment.find(params[:id])
+                present @todo_comment, with: V1::Entities::TodoCommentEntity
             end
 
             # 用件
             desc '作成'
             params do
                 requires :text, type: String
+                requires :todo_item_id, type: Integer
             end
             post '/' do
-                @todo_comment = TodoComment.create(text: params[:text])
+                @todo_comment = TodoComment.new(
+                    text: params[:text],
+                    todo_item_id: params[:todo_item_id]
+                    )
+
+                if @todo_comment.save
+                    status 201
+                    present @todo_comment, with: V1::Entities::TodoCommentEntity
+                else
+                    status 400
+                    present @todo_comment.errors.full_messages
+                end
             end
 
             desc '削除'
@@ -31,7 +46,14 @@ module V1
             end
             delete '/:id' do
                 @todo_comment = TodoComment.find(params[:id])
-                @todo_comment.destroy
+                
+                if @todo_comment.destroy
+                    status 202
+                    present nil
+                else
+                    stauts 400
+                    present @todo_comment.errors.full_messages
+                end
             end
 
             desc '編集'
@@ -41,7 +63,14 @@ module V1
             end
             patch '/:id' do
                 @todo_comment = TodoComment.find(params[:id])
-                @todo_comment.update(text: params[:text])
+
+                if @todo_comment.update(text: params[:text])
+                    status 203
+                    present @todo_comment, with: V1::Entities::TodoCommentEntity
+                else
+                    status 400
+                    present @todo_comment.errors.full_messages
+                end
             end
         end
     end
