@@ -72,6 +72,45 @@ module V1
                     present @todo_comment.errors.full_messages
                 end
             end
+
+            # desc '一括削除'
+            # params do
+            #     requires :id, type: Integer
+            #     requires :todo_item_id, type: Integer
+            # end
+            # delete '/:id' do
+            #     @todo_comment = TodoComment.find(params[:id])
+            #     todo_item = params[:todo_item_id]
+
+            #     if @todo_comment.destroy(todo_item)
+            #         status 204
+            #         present nil
+            #     else
+            #         status 400
+            #         present @todo_comment.errors.full_messages
+            #     end
+            # end
+
+            desc '一括削除'
+            params do
+                requires :id, type: Integer
+                requires :todo_item_id, type: Integer
+            end
+            delete '/:id' do
+                @todo_comment = TodoComment.find_by(
+                    id: params[:id],
+                    todo_item_id: params[:todo_item_id]
+                )
+                # この部分でtodo_itemを検索
+
+                if @todo_comment.destroy#_all
+                    status 204
+                    present nil  
+                else
+                    status 400
+                    present @todo_comment.errors.full_messages
+                end
+            end
         end
     end
 end

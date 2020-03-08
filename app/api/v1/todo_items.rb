@@ -66,6 +66,22 @@ module V1
                     present @todo_item.errors.full_messages
                 end
             end
+
+            # desc '一括削除'
+            # params do
+            #     requires :id, type: Integer
+            # end
+            # delete '/:id' do
+            #    @todo_item = TodoItem.find(params[:id])
+               
+            #    if @todo_item.todo_comment_id.destroy_all
+            #         status 204
+            #         present nil
+            #    else
+            #         status 400
+            #         present @todo_item.errors.full_messages
+            #    end
+            # end
         end
     end
 end

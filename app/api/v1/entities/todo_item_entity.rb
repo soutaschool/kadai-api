@@ -3,6 +3,7 @@ module V1
         class TodoItemEntity < Grape::Entity
             expose :id
             expose :text
+            expose :todo_comment, using: V1::Entities::TodoCommentEntity
         end
     end
 end
