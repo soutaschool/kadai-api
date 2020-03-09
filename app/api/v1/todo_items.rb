@@ -89,7 +89,9 @@ module V1
                 todo_item = TodoItem.find(params[:id])
 
                 todo_comments = todo_item.todo_comments.all
+                #  todo_commentsの全てを表示
                 if todo_comments.destroy_all
+                    # セベて削除
                     status 202
                     present nil
                 else
