@@ -5,17 +5,30 @@ module V1
             # 動作確認
             desc '一覧'
             get '/' do
-                @todo_items = TodoItem.all
-                present @todo_items, with: V1::Entities::TodoItemEntity
+                todo_items = TodoItem.all
+
+                # しっかり渡せているか？
+                if  todo_items.present?
+                    present todo_items, with: V1::Entities::TodoItemEntity
+                else
+                    status 404
+                    todo_items.errors.full_messages
+                end
             end
 
-            desc 'IDの取得'
+            desc '詳細'
             params do
                 requires :id, type: Integer
             end
             get '/:id' do
-                @todo_item = TodoItem.find(params[:id])
-                present @todo_item, with: V1::Entities::TodoItemEntity
+                todo_item = TodoItem.find(params[:id])
+
+                if  todo_item.present?
+                    present todo_item, with: V1::Entities::TodoItemEntity
+                else
+                    status 404
+                    todo_item.errors.full_messages
+                end
             end
 
             # 用件
@@ -24,14 +37,14 @@ module V1
                 requires :text, type: String
             end
             post '/' do
-                @todo_item = TodoItem.new(text: params[:text])
+                todo_item = TodoItem.new(text: params[:text])
 
-                if @todo_item.save
+                if todo_item.save
                     status 201
-                    present @todo_item, with: V1::Entities::TodoItemEntity
+                    present todo_item, with: V1::Entities::TodoItemEntity
                 else
                     status 400
-                    present @todo_item.errors.full_messages
+                    present todo_item.errors.full_messages
                 end
             end
 
@@ -40,13 +53,13 @@ module V1
                 requires :id, type: Integer
             end
             delete '/:id' do
-                @todo_item = TodoItem.find(params[:id])
-                if @todo_item.destroy
+                todo_item = TodoItem.find(params[:id])
+                if todo_item.destroy
                     status 202
                     present nil
                 else
                     status 400
-                    present @todo_item.errors.full_messages
+                    present todo_item.errors.full_messages
                 end
             end
 
@@ -56,32 +69,34 @@ module V1
                 requires :text, type: String
             end
             patch '/:id' do
-                @todo_item = TodoItem.find(params[:id])
+                todo_item = TodoItem.find(params[:id])
 
-                if @todo_item.update(text: params[:text])
+                if todo_item.update(text: params[:text])
                     status 203
-                    present @todo_item, with: V1::Entities::TodoItemEntity
+                    present todo_item, with: V1::Entities::TodoItemEntity
                 else
                     status 400
-                    present @todo_item.errors.full_messages
+                    present todo_item.errors.full_messages
                 end
             end
 
-            # desc '一括削除'
-            # params do
-            #     requires :id, type: Integer
-            # end
-            # delete '/:id' do
-            #    @todo_item = TodoItem.find(params[:id])
-               
-            #    if @todo_item.todo_comment_id.destroy_all
-            #         status 204
-            #         present nil
-            #    else
-            #         status 400
-            #         present @todo_item.errors.full_messages
-            #    end
-            # end
+            desc '一括削除'
+            # そもそもTodoItemを削除したら紐付けされているものを消すので
+            params do
+                requires :id, type: Integer
+            end
+            delete '/:id/todo_comments' do
+                todo_item = TodoItem.find(params[:id])
+
+                todo_comments = todo_item.todo_comments.all
+                if todo_comments.destroy_all
+                    status 202
+                    present nil
+                else
+                    status 400
+                    present todo_item.errors.full_messages
+                end
+            end
         end
     end
 end
