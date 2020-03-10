@@ -64,7 +64,7 @@ module V1
                     status 202
                     present nil
                 else
-                    stauts 400
+                    status 400
                     present todo_comment.errors.full_messages
                 end
             end
