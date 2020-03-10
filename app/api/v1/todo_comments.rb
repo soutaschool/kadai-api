@@ -60,11 +60,12 @@ module V1
             delete '/:id' do
                 todo_comment = TodoComment.find(params[:id])
                 
-                if  todo_comment.destroy
+                if  todo_comment.present?
+                    todo_comment.destroy
                     status 202
-                    present nil
+                    present todo_comment, with: V1::Entities::TodoCommentEntity
                 else
-                    status 400
+                    status 404
                     present todo_comment.errors.full_messages
                 end
             end

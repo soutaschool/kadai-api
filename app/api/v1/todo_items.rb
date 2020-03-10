@@ -39,7 +39,7 @@ module V1
             post '/' do
                 todo_item = TodoItem.new(text: params[:text])
 
-                if todo_item.save
+                if  todo_item.save
                     status 201
                     present todo_item, with: V1::Entities::TodoItemEntity
                 else
@@ -54,11 +54,13 @@ module V1
             end
             delete '/:id' do
                 todo_item = TodoItem.find(params[:id])
-                if todo_item.destroy
+
+                if  todo_item.present?
+                    todo_item.destroy
                     status 202
-                    present nil
+                    present todo_item, with: V1::Entities::TodoItemEntity
                 else
-                    status 400
+                    status 404
                     present todo_item.errors.full_messages
                 end
             end
@@ -71,7 +73,7 @@ module V1
             patch '/:id' do
                 todo_item = TodoItem.find(params[:id])
 
-                if todo_item.update(text: params[:text])
+                if  todo_item.update(text: params[:text])
                     status 203
                     present todo_item, with: V1::Entities::TodoItemEntity
                 else
@@ -88,14 +90,15 @@ module V1
             delete '/:id/todo_comments' do
                 todo_item = TodoItem.find(params[:id])
 
-                todo_comments = todo_item.todo_comments.all
-                #  todo_commentsの全てを表示
-                if todo_comments.destroy_all
-                    # セベて削除
+                if  todo_item.present?
+                    todo_comments = todo_item.todo_comments.all
+                    #  todo_commentsの全てを表示
+                    todo_comments.destroy_all
+                    # 全て削除
                     status 202
-                    present nil
+                    present todo_item, with: V1::Entities::TodoItemEntity
                 else
-                    status 400
+                    status 404
                     present todo_item.errors.full_messages
                 end
             end
