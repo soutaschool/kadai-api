@@ -62,7 +62,7 @@ module V1
                 
                 if  todo_comment.present?
                     todo_comment.destroy
-                    status 202
+                    status 200
                     present todo_comment, with: V1::Entities::TodoCommentEntity
                 else
                     status 404

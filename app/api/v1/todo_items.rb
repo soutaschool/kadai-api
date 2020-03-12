@@ -57,7 +57,7 @@ module V1
 
                 if  todo_item.present?
                     todo_item.destroy
-                    status 202
+                    status 200
                     present todo_item, with: V1::Entities::TodoItemEntity
                 else
                     status 404
@@ -95,7 +95,7 @@ module V1
                     #  todo_commentsの全てを表示
                     todo_comments.destroy_all
                     # 全て削除
-                    status 202
+                    status 200
                     present todo_item, with: V1::Entities::TodoItemEntity
                 else
                     status 404
